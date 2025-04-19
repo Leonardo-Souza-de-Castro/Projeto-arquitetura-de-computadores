@@ -1,40 +1,19 @@
 RS equ P1.3 
 EN equ P1.2
 
-org 0000h
+ORG 0000h
 	LJMP INICIO
 
-org 0100h
+ORG 0100h
+
 INICIO:
-
-;DB de respostas
-msg_hora:DB "Hora Atual:", 0
-msg_hora2:DB "12:34", 0
-
-msg_temp:DB "Temperatura:", 0
-msg_temp2:DB "25 GRAUS", 0 ;Vamos usar o sensor do Edsim51 de temperatura para simular esse valor
-
-msg_ligar:DB "Luzes acessas!", 0
-msg_ok:DB "Com Sucesso", 0 ;Vamos ascender os LED's para mostrar que as luzes foram acessas
-
-msg_desligar:DB "Luzes Desligadas", 0 ;Vamos apagar os LED's
-
-msg_som:DB "Emitindo Som:", 0
-msg_som2:DB "AGUARDE...", 0 ;Vamos emitir um som com o Buzzer do EdSim
-
-msg_dormir:DB "Entrando em", 0
-msg_dormir2:DB "Modo Repouso", 0
-msg_dormir3: DB "ZZZZZZZZZZZZ", 0
-
-msg_reiniciar:  DB "Reiniciando", 0
-msg_reiniciar2: DB "AGUARDE...", 0
-
-msg_ola:        DB "Ola, Como vai?", 0
-msg_ola2:       DB "Posso ajudar?", 0
-
-msg_erro:       DB "Não entendi!!", 0
-msg_erro2:      DB "Fale novamente", 0
-
+	MOV SCON, #01010000B ;Configurando SCON
+	MOV PCON, #10000000B ;Ativa o SCON
+	MOV TMOD, #20H ;CT1 no modo 2
+	MOV TH1, #243 ;valor para a recarga
+	MOV TL1, #243 ;valor para a primeira contagem
+	MOV IE,#90H ; Habilita interrupção serial
+	SETB TR1
 
 
 ;Sub-Rotinas -> Display
@@ -201,3 +180,31 @@ delay:
 	MOV R0, #50
 	DJNZ R0, $
 	RET
+
+;DB de respostas
+msg_hora:     DB  'H','o','r','a',' ','A','t','u','a','l',':',0
+msg_hora2:    DB  '1','2',':','3','4',0
+
+msg_temp:     DB  'T','e','m','p','e','r','a','t','u','r','a',':',0
+msg_temp2:    DB  '2','5',' ','G','R','A','U','S',0
+
+msg_ligar:    DB  'L','u','z','e','s',' ','a','c','e','s','a','s','!',0
+msg_ok:       DB  'C','o','m',' ','S','u','c','e','s','s','o',0
+
+msg_desligar: DB  'L','u','z','e','s',' ','D','e','s','l','i','g','a','d','a','s',0
+
+msg_som:      DB  'E','m','i','t','i','n','d','o',' ','S','o','m',':',0
+msg_som2:     DB  'A','G','U','A','R','D','E','.','.','.','.',0
+
+msg_dormir:   DB  'E','n','t','r','a','n','d','o',' ','e','m',0
+msg_dormir2:  DB  'M','o','d','o',' ','R','e','p','o','u','s','o',0
+msg_dormir3:  DB  'Z','Z','Z','Z','Z','Z','Z','Z','Z','Z','Z','Z',0
+
+msg_reiniciar:  DB 'R','e','i','n','i','c','i','a','n','d','o',0
+msg_reiniciar2: DB 'A','G','U','A','R','D','E','.','.','.','.',0
+
+msg_ola:        DB 'O','l','a',' ','C','o','m','o',' ','v','a','i','?',0
+msg_ola2:       DB 'P','o','s','s','o',' ','a','j','u','d','a','r','?',0
+
+msg_erro:       DB 'N','a','o',' ','e','n','t','e','n','d','i','!',0
+msg_erro2:      DB 'F','a','l','e',' ','n','o','v','a','m','e','n','t','e',0
