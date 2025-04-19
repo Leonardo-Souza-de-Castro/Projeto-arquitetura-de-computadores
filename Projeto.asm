@@ -10,11 +10,40 @@ INICIO:
 	MOV SCON, #01010000B ;Configurando SCON
 	MOV PCON, #10000000B ;Ativa o SCON
 	MOV TMOD, #20H ;CT1 no modo 2
-	MOV TH1, #243 ;valor para a recarga
-	MOV TL1, #243 ;valor para a primeira contagem
+	MOV TH1, #243  ;valor para a recarga
+	MOV TL1, #243  ;valor para a primeira contagem
 	MOV IE,#90H ; Habilita interrupção serial
 	SETB TR1
+	MOV R0, #30H
 
+SALVAR_ACAO:
+	JNB RI, SALVAR_ACAO
+	CLR RI
+	MOV A, SBUF
+	MOV @R0, A
+	CJNE A, #'$', CONTINUAR
+	SJMP FIM
+
+CONTINUAR:
+	INC R0
+	SJMP SALVAR_ACAO
+
+FIM:
+	MOV R0, #30H
+	sjmp ENVIA
+
+ENVIA:
+	MOV A, @R0
+	MOV SBUF, A
+	WAIT_TX:
+		JNB TI, WAIT_TX
+		CLR TI
+	CJNE A, #'$', CONT
+	SJMP $
+
+CONT:
+	INC R0
+	SJMP ENVIA
 
 ;Sub-Rotinas -> Display
 lcd_init:
