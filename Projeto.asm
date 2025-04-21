@@ -20,6 +20,17 @@ SALVAR_ACAO:
 	JNB RI, SALVAR_ACAO
 	CLR RI
 	MOV A, SBUF
+    
+	; Veririca se são caracteres de validacao do ASCII como enters e /r
+	CJNE A, #0DH, VERIFICA_LF
+	SJMP SALVAR_ACAO    
+    
+VERIFICA_LF:
+	; Verifica se é LF (0A)
+	CJNE A, #0AH, SALVAR_CARACTERE
+	SJMP SALVAR_ACAO    ; Ignora LF e volta para esperar próximo caractere
+    
+SALVAR_CARACTERE:
 	MOV @R0, A
 	CJNE A, #'$', CONTINUAR
 	SJMP FIM
@@ -30,20 +41,52 @@ CONTINUAR:
 
 FIM:
 	MOV R0, #30H
-	sjmp ENVIA
+	MOV DPTR, #msg_horas
+	ACALL COMPARAR_STRING
+	JZ HORAS
+	
+COMPARAR_STRING:
+	MOV R0, #30H
 
-ENVIA:
-	MOV A, @R0
-	MOV SBUF, A
-	WAIT_TX:
-		JNB TI, WAIT_TX
-		CLR TI
-	CJNE A, #'$', CONT
+COMPARAR_LOOP:
+	MOV A, @R0        ; Caractere atual da RAM
+	MOV B, A  ; Guarda o caractere da RAM
+	CLR A
+	MOVC A, @A+DPTR     ; Caractere atual da ROM
+	CJNE A, B, NAO_IGUAL
+	CJNE A, #'$', CONTINUAR_2
+	CLR A
+	RET
+
+CONTINUAR_2:
+	INC R0
+	INC DPTR
+	SJMP COMPARAR_LOOP
+
+NAO_IGUAL:
 	SJMP $
 
-CONT:
-	INC R0
-	SJMP ENVIA
+HORAS:
+	ACALL lcd_init
+	MOV A, #03H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_hora
+	ACALL escreveString
+	MOV A, #42H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_hora2
+	ACALL escreveString
+	RET
+	
+escreveString:
+	MOV R2, #0
+rot:
+	MOV A, R2
+	MOVC A,@A+DPTR ;lê a tabela da memória de programa
+	ACALL sendCharacter ; send data in A to LCD module
+	INC R2
+	JNZ rot ; if A is 0, then end of data has been reached - jump out of loop
+	RET
 
 ;Sub-Rotinas -> Display
 lcd_init:
@@ -209,6 +252,23 @@ delay:
 	MOV R0, #50
 	DJNZ R0, $
 	RET
+
+;DB de pergunta
+msg_horas:   DB 'Q','u','e',' ','h','o','r','a','s',' ','s','a','o','?','$',0
+
+msg_clima:       DB 'C','o','m','o',' ','e','s','t','a',' ','o',' ','c','l','i','m','a','?','$',0
+
+msg_ligar_luz:   DB 'A','s','c','e','n','d','e','r',' ','a','s',' ','l','u','z','e','s','$',0
+
+msg_apagar_luz:  DB 'A','p','a','g','a','r',' ','a','s',' ','l','u','z','e','s','$',0
+
+msg_emitir_som:  DB 'E','m','i','t','a',' ','u','m',' ','s','o','m','$',0
+
+msg_reposo:      DB 'E','n','t','r','a','r',' ','e','m',' ','m','o','d','o',' ','r','e','p','o','u','s','o','$',0
+
+msg_reiniciar3:  DB 'R','e','i','n','i','c','i','a','r','$',0
+
+msg_ola3:        DB 'O','l','a','$',0
 
 ;DB de respostas
 msg_hora:     DB  'H','o','r','a',' ','A','t','u','a','l',':',0
