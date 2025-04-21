@@ -1,9 +1,7 @@
 RS equ P1.3 
 EN equ P1.2
-
 ORG 0000h
 	LJMP INICIO
-
 ORG 0100h
 
 INICIO:
@@ -20,7 +18,6 @@ SALVAR_ACAO:
 	JNB RI, SALVAR_ACAO
 	CLR RI
 	MOV A, SBUF
-    
 	; Veririca se são caracteres de validacao do ASCII como enters e /r
 	CJNE A, #0DH, VERIFICA_LF
 	SJMP SALVAR_ACAO    
@@ -29,7 +26,7 @@ VERIFICA_LF:
 	; Verifica se é LF (0A)
 	CJNE A, #0AH, SALVAR_CARACTERE
 	SJMP SALVAR_ACAO    ; Ignora LF e volta para esperar próximo caractere
-    
+
 SALVAR_CARACTERE:
 	MOV @R0, A
 	CJNE A, #'$', CONTINUAR
@@ -41,10 +38,176 @@ CONTINUAR:
 
 FIM:
 	MOV R0, #30H
+
 	MOV DPTR, #msg_horas
 	ACALL COMPARAR_STRING
 	JZ HORAS
-	
+
+	MOV DPTR, #msg_ligar_luz
+	ACALL COMPARAR_STRING
+	JZ LUZ
+
+	MOV DPTR, #msg_apagar_luz
+	ACALL COMPARAR_STRING
+	JZ APAGAR_LUZ
+
+	MOV DPTR, #msg_emitir_som
+	ACALL COMPARAR_STRING
+	JZ SOM
+
+	MOV DPTR, #msg_repouso_pergunta
+	ACALL COMPARAR_STRING
+	JZ FLAG_REPOUSO
+
+	MOV DPTR, #msg_reiniciar3
+	ACALL COMPARAR_STRING
+	JZ FLAG_REINICIAR
+
+	MOV DPTR, #msg_ola3
+	ACALL COMPARAR_STRING
+	JZ FLAG_OLA
+
+	MOV DPTR, #msg_clima
+	ACALL COMPARAR_STRING
+	JZ FLAG_CLIMA
+
+FLAG_OLA:
+	LJMP OLA
+FLAG_CLIMA:
+	LJMP CLIMA
+FLAG_REINICIAR:
+	LJMP REINICIAR
+FLAG_REPOUSO:
+	LJMP REPOUSO
+
+HORAS:
+	ACALL lcd_init
+	ACALL clearDisplay
+	ACALL delay_longo
+	MOV A, #03H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_hora
+	ACALL escreveString
+	MOV A, #42H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_hora2
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+LUZ:
+	ACALL lcd_init
+	ACALL clearDisplay
+	ACALL delay_longo
+	MOV A, #02H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_ligar
+	ACALL escreveString
+	MOV A, #41H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_ok
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+APAGAR_LUZ:
+	ACALL lcd_init
+	ACALL clearDisplay
+	ACALL delay_longo
+	MOV A, #00H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_desligar
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+SOM:
+	ACALL lcd_init
+	ACALL clearDisplay
+	ACALL delay_longo
+	MOV A, #01H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_som
+	ACALL escreveString
+	MOV A, #41H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_som2
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+REPOUSO:
+	ACALL lcd_init
+	ACALL clearDisplay
+	ACALL delay_longo
+	MOV A, #01H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_dormir
+	ACALL escreveString
+	MOV A, #41H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_dormir2
+	ACALL escreveString
+
+	ACALL delay
+	ACALL clearDisplay
+	ACALL delay_longo
+
+	MOV A, #01H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_dormir3
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+REINICIAR:
+	ACALL lcd_init
+	ACALL clearDisplay
+
+	ACALL delay_longo
+	MOV A, #01H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_reiniciar
+	ACALL escreveString
+	MOV A, #41H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_reiniciar2
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+OLA:
+	ACALL lcd_init
+	ACALL clearDisplay
+
+	ACALL delay_longo
+	MOV A, #01H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_ola
+	ACALL escreveString
+	MOV A, #41H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_ola2
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+CLIMA:
+	ACALL lcd_init
+	ACALL clearDisplay
+
+	ACALL delay_longo
+	MOV A, #01H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_temp
+	ACALL escreveString
+	MOV A, #44H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_temp2
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
 COMPARAR_STRING:
 	MOV R0, #30H
 
@@ -64,18 +227,6 @@ CONTINUAR_2:
 	SJMP COMPARAR_LOOP
 
 NAO_IGUAL:
-	SJMP $
-
-HORAS:
-	ACALL lcd_init
-	MOV A, #03H
-	ACALL posicionaCursor
-	MOV DPTR, #msg_hora
-	ACALL escreveString
-	MOV A, #42H
-	ACALL posicionaCursor
-	MOV DPTR, #msg_hora2
-	ACALL escreveString
 	RET
 	
 escreveString:
@@ -206,27 +357,6 @@ posicionaCursor:
 	CALL delay		
 	RET
 
-retornaCursor:
-	CLR RS	      
-	CLR P1.7		
-	CLR P1.6		
-	CLR P1.5		
-	CLR P1.4		
-
-	SETB EN		
-	CLR EN		
-
-	CLR P1.7		
-	CLR P1.6		
-	SETB P1.5		
-	SETB P1.4		
-
-	SETB EN		
-	CLR EN		
-
-	CALL delay		
-	RET
-
 clearDisplay:
 	CLR RS	      
 	CLR P1.7		
@@ -253,6 +383,13 @@ delay:
 	DJNZ R0, $
 	RET
 
+delay_longo:
+	MOV R3, #100     ; 100 * delay curto (~50 * instruções)
+loop_delay:
+	ACALL delay
+	DJNZ R3, loop_delay
+	RET
+
 ;DB de pergunta
 msg_horas:   DB 'Q','u','e',' ','h','o','r','a','s',' ','s','a','o','?','$',0
 
@@ -264,7 +401,7 @@ msg_apagar_luz:  DB 'A','p','a','g','a','r',' ','a','s',' ','l','u','z','e','s',
 
 msg_emitir_som:  DB 'E','m','i','t','a',' ','u','m',' ','s','o','m','$',0
 
-msg_reposo:      DB 'E','n','t','r','a','r',' ','e','m',' ','m','o','d','o',' ','r','e','p','o','u','s','o','$',0
+msg_repouso_pergunta:      DB 'E','n','t','r','a','r',' ','e','m',' ','m','o','d','o',' ','r','e','p','o','u','s','o','$',0
 
 msg_reiniciar3:  DB 'R','e','i','n','i','c','i','a','r','$',0
 
