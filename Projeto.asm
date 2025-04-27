@@ -1,3 +1,5 @@
+;Obs: Para o projeto rodar, precisamos mudar os pinos do LED para p0
+
 RS equ P1.3 
 EN equ P1.2
 ORG 0000h
@@ -96,6 +98,7 @@ HORAS:
 	RET
 
 LUZ:
+	MOV P0, #00000000B
 	ACALL lcd_init
 	ACALL clearDisplay
 	ACALL delay_longo
@@ -103,7 +106,7 @@ LUZ:
 	ACALL posicionaCursor
 	MOV DPTR, #msg_ligar
 	ACALL escreveString
-	MOV A, #41H
+	MOV A, #42H
 	ACALL posicionaCursor
 	MOV DPTR, #msg_ok
 	ACALL escreveString
@@ -111,6 +114,7 @@ LUZ:
 	RET
 
 APAGAR_LUZ:
+	MOV P0, #11111111B
 	ACALL lcd_init
 	ACALL clearDisplay
 	ACALL delay_longo
