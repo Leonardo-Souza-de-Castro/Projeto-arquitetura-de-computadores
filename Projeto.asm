@@ -73,6 +73,9 @@ FIM:
 	ACALL COMPARAR_STRING
 	JZ FLAG_CLIMA
 
+	ACALL ERRO_MENSAGEM
+	LJMP SALVAR_ACAO
+
 FLAG_OLA:
 	LJMP OLA
 FLAG_CLIMA:
@@ -208,6 +211,22 @@ CLIMA:
 	MOV A, #44H
 	ACALL posicionaCursor
 	MOV DPTR, #msg_temp2
+	ACALL escreveString
+	MOV R0, #30H
+	RET
+
+ERRO_MENSAGEM:
+	ACALL lcd_init
+	ACALL clearDisplay
+
+	ACALL delay_longo
+	MOV A, #02H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_erro
+	ACALL escreveString
+	MOV A, #41H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_erro2
 	ACALL escreveString
 	MOV R0, #30H
 	RET
@@ -419,7 +438,7 @@ msg_temp:     DB  'T','e','m','p','e','r','a','t','u','r','a',':',0
 msg_temp2:    DB  '2','5',' ','G','R','A','U','S',0
 
 msg_ligar:    DB  'L','u','z','e','s',' ','a','c','e','s','a','s','!',0
-msg_ok:       DB  'C','o','m',' ','S','u','c','e','s','s','o',0
+msg_ok:       DB  'C','o','m',' ','S','u','c','e','s','s','o','!',0
 
 msg_desligar: DB  'L','u','z','e','s',' ','D','e','s','l','i','g','a','d','a','s',0
 
