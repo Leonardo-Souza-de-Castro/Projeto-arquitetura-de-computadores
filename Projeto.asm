@@ -7,6 +7,8 @@ ORG 0000h
 ORG 0100h
 
 INICIO:
+	ACALL BV_MENSAGEM
+
 	MOV SCON, #01010000B ;Configurando SCON
 	MOV PCON, #10000000B ;Ativa o SCON
 	MOV TMOD, #20H ;CT1 no modo 2
@@ -16,6 +18,8 @@ INICIO:
 	SETB TR1
 	MOV R0, #30H
 	MOV R1, #29H
+
+	
 
 SALVAR_ACAO:
 	JNB RI, SALVAR_ACAO
@@ -165,7 +169,12 @@ REINICIAR:
 	MOV DPTR, #msg_reiniciar2
 	ACALL escreveString
 
+	ACALL delay_longo
 	ACALL LIMPAR_MEMORIA
+	ACALL delay_longo
+	ACALL clearDisplay
+	ACALL delay_longo
+	ACALL BV_MENSAGEM
 	MOV R0, #30H
 	RET
 
@@ -269,6 +278,30 @@ LIMPAR_MEMORIA:
 	MOV R6, #00H
 	MOV R7, #00H
 	MOV R1, #29H
+	RET
+
+BV_MENSAGEM:
+	ACALL lcd_init
+	ACALL clearDisplay
+
+	ACALL delay_longo
+	MOV A, #01H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_bv
+	ACALL escreveString
+	MOV A, #41H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_bv2
+	ACALL escreveString
+
+	ACALL delay_longo
+	ACALL clearDisplay
+	ACALL delay_longo
+	MOV A, #02H
+	ACALL posicionaCursor
+	MOV DPTR, #msg_bv3
+	ACALL escreveString
+	MOV R0, #30H
 	RET
 
 COMPARAR_STRING:
@@ -507,3 +540,7 @@ msg_ola2:       DB 'P','o','s','s','o',' ','a','j','u','d','a','r','?',0
 
 msg_erro:       DB 'N','a','o',' ','e','n','t','e','n','d','i','!',0
 msg_erro2:      DB 'F','a','l','e',' ','n','o','v','a','m','e','n','t','e',0
+
+msg_bv:       DB 'O','l','a' ,' ','B','e','m',' ','v','i','n','d','o',0
+msg_bv2:      DB 'C','o','l','o','q','u','e',' ','e','s','p','a','c','o',0
+msg_bv3:      DB 'N','o',' ','1',' ','c','o','m','a','n','d','o',0
