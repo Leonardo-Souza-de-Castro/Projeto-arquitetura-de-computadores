@@ -1,4 +1,4 @@
-# Alexa EmSim51
+# Alexa
 
 ## 📝 Introdução
 
@@ -357,3 +357,11 @@ O sistema opera seguindo estas etapas:
 | **Entrar em modo repouso** | Ativa o modo de repouso |
 | **Reiniciar** | Reinicia todo o sistema |
 | **Ola** | Responde com uma saudação |
+
+---
+## 🧬 Experimentos
+
+![image](https://github.com/Leonardo-Souza-de-Castro/Projeto-arquitetura-de-computadores/blob/main/img/Ola.png)
+![image](https://github.com/Leonardo-Souza-de-Castro/Projeto-arquitetura-de-computadores/blob/main/img/Ola_processado.png)
+![image](https://github.com/Leonardo-Souza-de-Castro/Projeto-arquitetura-de-computadores/blob/main/img/Ascender.png)
+![image](https://github.com/Leonardo-Souza-de-Castro/Projeto-arquitetura-de-computadores/blob/main/img/Apagar.png)
