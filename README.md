@@ -365,3 +365,74 @@ O sistema opera seguindo estas etapas:
 ![image](https://github.com/Leonardo-Souza-de-Castro/Projeto-arquitetura-de-computadores/blob/main/img/Ola_processado.png)
 ![image](https://github.com/Leonardo-Souza-de-Castro/Projeto-arquitetura-de-computadores/blob/main/img/Ascender.png)
 ![image](https://github.com/Leonardo-Souza-de-Castro/Projeto-arquitetura-de-computadores/blob/main/img/Apagar.png)
+
+---
+
+## 📈 Diagrama do projeto
+
+```mermaid
+flowchart TD
+    A[Início] --> B[Configuração Inicial]
+    B --> C[BV_MENSAGEM - Exibe mensagem de boas-vindas]
+    C --> D[Configuração da Comunicação Serial]
+    D --> E[SALVAR_ACAO]
+    
+    E -->|Recebe Caractere| F{Caractere = CR?}
+    F -->|Sim| E
+    F -->|Não| G{Caractere = LF?}
+    G -->|Sim| E
+    G -->|Não| H[SALVAR_CARACTERE]
+    
+    H --> I{Caractere = '$'?}
+    I -->|Sim| J[FIM - Processa comando]
+    I -->|Não| K[Incrementa Ponteiro]
+    K --> E
+    
+    J --> L{Compara com comandos conhecidos}
+    
+    L -->|"Que horas sao?"| M[HORAS]
+    L -->|"Como esta o clima?"| N[CLIMA]
+    L -->|"Ascender as luzes"| O[LUZ]
+    L -->|"Apagar as luzes"| P[APAGAR_LUZ]
+    L -->|"Entrar em modo repouso"| Q[REPOUSO]
+    L -->|"Reiniciar"| R[REINICIAR]
+    L -->|"Ola"| S[OLA]
+    L -->|Comando Desconhecido| T[ERRO_MENSAGEM]
+    
+    M --> U[Exibe hora atual no LCD]
+    N --> V[Mede temperatura e exibe no LCD]
+    O --> W[Liga LEDs e exibe confirmação]
+    P --> X[Desliga LEDs e exibe confirmação]
+    Q --> Y[Exibe mensagem de repouso]
+    R --> Z[Reinicia o sistema]
+    S --> AA[Exibe saudação]
+    T --> AB[Exibe erro]
+    
+    U --> AC[Limpa registradores]
+    V --> AC
+    W --> AC
+    X --> AC
+    Y --> AC
+    Z --> C
+    AA --> AC
+    AB --> AC
+    
+    AC --> E
+    
+    subgraph "Sub-rotinas do LCD"
+    LCD1[lcd_init - Inicializa LCD]
+    LCD2[sendCharacter - Envia caractere]
+    LCD3[posicionaCursor - Posiciona cursor]
+    LCD4[clearDisplay - Limpa display]
+    LCD5[escreveString - Escreve string]
+    LCD6[delay - Atraso curto]
+    LCD7[delay_longo - Atraso longo]
+    end
+    
+    subgraph "Sub-rotinas de Utilidade"
+    UTIL1[LIMPAR_MEMORIA - Limpa toda a memória]
+    UTIL2[LIMPAR_REGISTRADORES - Limpa registradores]
+    UTIL3[COMPARAR_STRING - Compara strings]
+    UTIL4[MEDIR_TEMP - Lê sensor de temperatura]
+    end
+```
